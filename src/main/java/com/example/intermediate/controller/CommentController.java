@@ -1,6 +1,6 @@
 package com.example.intermediate.controller;
 
-import com.example.intermediate.configuration.ResponseDto;
+import com.example.intermediate.controller.response.ResponseDto;
 import com.example.intermediate.controller.request.CommentRequestDto;
 import com.example.intermediate.service.CommentService;
 import javax.servlet.http.HttpServletRequest;

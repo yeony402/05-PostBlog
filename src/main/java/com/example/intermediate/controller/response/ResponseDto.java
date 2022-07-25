@@ -1,4 +1,4 @@
-package com.example.intermediate.configuration;
+package com.example.intermediate.controller.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

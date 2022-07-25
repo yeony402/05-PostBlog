@@ -28,12 +28,12 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-//     로그인을 위한 JWT 관련 설정
+//     JWT
     compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
 
-//     회원가입 정보 확인을 위한 validation
+//     validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 }

@@ -1,6 +1,6 @@
 package com.example.intermediate.controller;
 
-import com.example.intermediate.configuration.ResponseDto;
+import com.example.intermediate.controller.response.ResponseDto;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
