@@ -1,15 +1,14 @@
 package com.example.intermediate.controller;
 
-import com.example.intermediate.domain.dto.PostRequestDto;
-import com.example.intermediate.domain.dto.ResponseDto;
+import com.example.intermediate.controller.request.PostRequestDto;
+import com.example.intermediate.configuration.ResponseDto;
 import com.example.intermediate.service.PostService;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -18,34 +17,32 @@ public class PostController {
 
   private final PostService postService;
 
-  @PostMapping("/api/post")
-  public ResponseDto<?> createPost(@RequestBody PostRequestDto requestDto) {
-    return postService.createPost(requestDto);
+  @RequestMapping(value = "/api/auth/post", method = RequestMethod.POST)
+  public ResponseDto<?> createPost(@RequestBody PostRequestDto requestDto,
+      HttpServletRequest request) {
+    return postService.createPost(requestDto, request);
   }
 
-  @GetMapping("/api/post/{id}")
+  @RequestMapping(value = "/api/post/{id}", method = RequestMethod.GET)
   public ResponseDto<?> getPost(@PathVariable Long id) {
     return postService.getPost(id);
   }
 
-  @GetMapping("/api/post")
+  @RequestMapping(value = "/api/post", method = RequestMethod.GET)
   public ResponseDto<?> getAllPosts() {
     return postService.getAllPost();
   }
 
-  @PutMapping("/api/post/{id}")
-  public ResponseDto<?> updatePost(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto) {
-    return postService.updatePost(id, postRequestDto);
+  @RequestMapping(value = "/api/auth/post/{id}", method = RequestMethod.PUT)
+  public ResponseDto<?> updatePost(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto,
+      HttpServletRequest request) {
+    return postService.updatePost(id, postRequestDto, request);
   }
 
-  @DeleteMapping("/api/post/{id}")
-  public ResponseDto<?> deletePost(@PathVariable Long id) {
-    return postService.deletePost(id);
-  }
-
-  @PostMapping("/api/post/{id}")
-  public ResponseDto<?> validateAuthorByPassword(@PathVariable Long id, @RequestBody String password) {
-    return postService.isAuthor(id, password);
+  @RequestMapping(value = "/api/auth/post/{id}", method = RequestMethod.DELETE)
+  public ResponseDto<?> deletePost(@PathVariable Long id,
+      HttpServletRequest request) {
+    return postService.deletePost(id, request);
   }
 
 }

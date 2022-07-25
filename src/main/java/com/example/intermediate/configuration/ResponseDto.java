@@ -1,11 +1,11 @@
-package com.example.intermediate.domain.dto;
+package com.example.intermediate.configuration;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ResponseDto<T> extends Throwable {
+public class ResponseDto<T> {
   private boolean success;
   private T data;
   private Error error;

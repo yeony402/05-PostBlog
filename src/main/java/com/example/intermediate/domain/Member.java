@@ -1,7 +1,7 @@
 package com.example.intermediate.domain;
 
-import com.example.intermediate.domain.dto.MemberRequestDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.hibernate.Hibernate;
 
 @Builder
 @Getter
@@ -31,9 +31,20 @@ public class Member extends Timestamped {
   @JsonIgnore
   private String password;
 
-  public Member(MemberRequestDto memberRequestDto, PasswordEncoder passwordEncoder) {
-    Member.builder()
-        .nickname(memberRequestDto.getNickname())
-        .password(passwordEncoder.encode(memberRequestDto.getPassword()));
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+      return false;
+    }
+    Member member = (Member) o;
+    return id != null && Objects.equals(id, member.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }

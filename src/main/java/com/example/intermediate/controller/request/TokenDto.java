@@ -1,4 +1,4 @@
-package com.example.intermediate.domain.dto;
+package com.example.intermediate.controller.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

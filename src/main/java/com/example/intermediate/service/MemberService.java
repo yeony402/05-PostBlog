@@ -1,24 +1,21 @@
 package com.example.intermediate.service;
 
+import com.example.intermediate.controller.response.MemberResponseDto;
 import com.example.intermediate.domain.Member;
 import com.example.intermediate.domain.RefreshToken;
-import com.example.intermediate.domain.UserDetailsImpl;
-import com.example.intermediate.domain.dto.LoginRequestDto;
-import com.example.intermediate.domain.dto.MemberRequestDto;
-import com.example.intermediate.domain.dto.ResponseDto;
-import com.example.intermediate.domain.dto.TokenDto;
+import com.example.intermediate.controller.request.LoginRequestDto;
+import com.example.intermediate.controller.request.MemberRequestDto;
+import com.example.intermediate.configuration.ResponseDto;
+import com.example.intermediate.controller.request.TokenDto;
 import com.example.intermediate.jwt.TokenProvider;
 import com.example.intermediate.repository.MemberRepository;
-import com.example.intermediate.repository.RefreshTokenRepository;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
   private final MemberRepository memberRepository;
-  private final RefreshTokenRepository refreshTokenRepository;
 
   private final PasswordEncoder passwordEncoder;
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
   private final TokenProvider tokenProvider;
 
   @Transactional
@@ -47,9 +42,19 @@ public class MemberService {
           "password and password confirm are not matched");
     }
 
-    Member member = new Member(requestDto, passwordEncoder);
+    Member member = Member.builder()
+            .nickname(requestDto.getNickname())
+                .password(passwordEncoder.encode(requestDto.getPassword()))
+                    .build();
     memberRepository.save(member);
-    return ResponseDto.success(member);
+    return ResponseDto.success(
+        MemberResponseDto.builder()
+            .id(member.getId())
+            .nickname(member.getNickname())
+            .createdAt(member.getCreatedAt())
+            .modifiedAt(member.getModifiedAt())
+            .build()
+    );
   }
 
   @Transactional
@@ -65,25 +70,31 @@ public class MemberService {
     Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
     TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
-
-    RefreshToken refreshToken = RefreshToken.builder()
-        .id(member.getId())
-        .value(tokenDto.getRefreshToken())
-        .build();
-
-    refreshTokenRepository.save(refreshToken);
     tokenToHeaders(tokenDto, response);
-    return ResponseDto.success(member);
+
+    return ResponseDto.success(
+        MemberResponseDto.builder()
+            .id(member.getId())
+            .nickname(member.getNickname())
+            .createdAt(member.getCreatedAt())
+            .modifiedAt(member.getModifiedAt())
+            .build()
+    );
   }
 
   @Transactional
-  public ResponseDto<?> reissue(Long id, HttpServletRequest request, HttpServletResponse response) {
+  public ResponseDto<?> reissue(HttpServletRequest request, HttpServletResponse response) {
     if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
       return ResponseDto.fail("INVALID_TOKEN", "refresh token is invalid");
     }
+    Member member = tokenProvider.getMemberFromAuthentication();
+    if (null == member) {
+      return ResponseDto.fail("MEMBER_NOT_FOUND",
+          "member not found");
+    }
 
     Authentication authentication = tokenProvider.getAuthentication(request.getHeader("Access-Token"));
-    RefreshToken refreshToken = isPresentRefreshToken(id);
+    RefreshToken refreshToken = tokenProvider.isPresentRefreshToken(member);
 
     if (!refreshToken.getValue().equals(request.getHeader("Refresh-Token"))) {
       return ResponseDto.fail("INVALID_TOKEN", "refresh token is invalid");
@@ -92,43 +103,26 @@ public class MemberService {
     TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
     refreshToken.updateValue(tokenDto.getRefreshToken());
     tokenToHeaders(tokenDto, response);
-    return ResponseDto.success("reissue success");
+    return ResponseDto.success("success");
   }
 
   public ResponseDto<?> logout(HttpServletRequest request) {
     if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
       return ResponseDto.fail("INVALID_TOKEN", "refresh token is invalid");
     }
-    Member member = getMemberFromAuthentication();
+    Member member = tokenProvider.getMemberFromAuthentication();
     if (null == member) {
       return ResponseDto.fail("MEMBER_NOT_FOUND",
           "member not found");
     }
 
-    RefreshToken refreshToken = isPresentRefreshToken(member.getId());
-    refreshTokenRepository.delete(refreshToken);
-    return ResponseDto.success("logout success");
+    return tokenProvider.deleteRefreshToken(member);
   }
 
   @Transactional(readOnly = true)
   public Member isPresentMember(String nickname) {
     Optional<Member> optionalMember = memberRepository.findByNickname(nickname);
     return optionalMember.orElse(null);
-  }
-
-  @Transactional(readOnly = true)
-  public RefreshToken isPresentRefreshToken(Long id) {
-    Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findById(id);
-    return optionalRefreshToken.orElse(null);
-  }
-
-  public Member getMemberFromAuthentication() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication == null || AnonymousAuthenticationToken.class.
-        isAssignableFrom(authentication.getClass())) {
-      return null;
-    }
-    return ((UserDetailsImpl) authentication.getPrincipal()).getMember();
   }
 
   public void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {

@@ -1,28 +1,33 @@
 package com.example.intermediate.jwt;
 
-import com.example.intermediate.domain.dto.TokenDto;
+import com.example.intermediate.domain.Member;
+import com.example.intermediate.domain.RefreshToken;
+import com.example.intermediate.domain.UserDetailsImpl;
+import com.example.intermediate.configuration.ResponseDto;
+import com.example.intermediate.controller.request.TokenDto;
+import com.example.intermediate.repository.RefreshTokenRepository;
 import com.example.intermediate.service.UserDetailsServiceImpl;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SecurityException;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -34,9 +39,13 @@ public class TokenProvider {
   private static final long REFRESH_TOKEN_EXPRIRE_TIME = 1000 * 60 * 60 * 24 * 7;     //7일
 
   private final Key key;
+
+  private final RefreshTokenRepository refreshTokenRepository;
   private final UserDetailsServiceImpl userDetailsService;
 
-  public TokenProvider(@Value("${jwt.secret}") String secretKey, UserDetailsServiceImpl userDetailsService) {
+  public TokenProvider(@Value("${jwt.secret}") String secretKey,
+      RefreshTokenRepository refreshTokenRepository, UserDetailsServiceImpl userDetailsService) {
+    this.refreshTokenRepository = refreshTokenRepository;
     this.userDetailsService = userDetailsService;
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
     this.key = Keys.hmacShaKeyFor(keyBytes);
@@ -61,6 +70,16 @@ public class TokenProvider {
         .setExpiration(new Date(now + REFRESH_TOKEN_EXPRIRE_TIME))
         .signWith(key, SignatureAlgorithm.HS256)
         .compact();
+
+    Member member = ((UserDetailsImpl) authentication.getPrincipal()).getMember();
+
+    RefreshToken refreshTokenObject = RefreshToken.builder()
+        .id(member.getId())
+        .member(member)
+        .value(refreshToken)
+        .build();
+
+    refreshTokenRepository.save(refreshTokenObject);
 
     return TokenDto.builder()
         .grantType(BEARER_TYPE)
@@ -88,6 +107,15 @@ public class TokenProvider {
     return new UsernamePasswordAuthenticationToken(principal, "", authorities);
   }
 
+  public Member getMemberFromAuthentication() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null || AnonymousAuthenticationToken.class.
+        isAssignableFrom(authentication.getClass())) {
+      return null;
+    }
+    return ((UserDetailsImpl) authentication.getPrincipal()).getMember();
+  }
+
   public boolean validateToken(String token) {
     try {
       Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -110,5 +138,22 @@ public class TokenProvider {
     } catch (ExpiredJwtException e) {
       return e.getClaims();
     }
+  }
+
+  @Transactional(readOnly = true)
+  public RefreshToken isPresentRefreshToken(Member member) {
+    Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByMember(member);
+    return optionalRefreshToken.orElse(null);
+  }
+
+  @Transactional
+  public ResponseDto<?> deleteRefreshToken(Member member) {
+    RefreshToken refreshToken = isPresentRefreshToken(member);
+    if (null == refreshToken) {
+      return ResponseDto.fail("TOKEN_NOT_FOUND", "refresh token not found");
+    }
+
+    refreshTokenRepository.delete(refreshToken);
+    return ResponseDto.success("success");
   }
 }

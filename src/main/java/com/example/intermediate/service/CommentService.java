@@ -1,15 +1,13 @@
 package com.example.intermediate.service;
 
+import com.example.intermediate.configuration.ResponseDto;
 import com.example.intermediate.controller.response.CommentResponseDto;
-import com.example.intermediate.controller.response.PostResponseDto;
 import com.example.intermediate.domain.Comment;
 import com.example.intermediate.domain.Member;
 import com.example.intermediate.domain.Post;
-import com.example.intermediate.controller.request.PostRequestDto;
-import com.example.intermediate.configuration.ResponseDto;
+import com.example.intermediate.controller.request.CommentRequestDto;
 import com.example.intermediate.jwt.TokenProvider;
 import com.example.intermediate.repository.CommentRepository;
-import com.example.intermediate.repository.PostRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,41 +18,45 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class PostService {
+public class CommentService {
 
-  private final PostRepository postRepository;
   private final CommentRepository commentRepository;
 
   private final TokenProvider tokenProvider;
+  private final PostService postService;
 
   @Transactional
-  public ResponseDto<?> createPost(PostRequestDto requestDto, HttpServletRequest request) {
+  public ResponseDto<?> createComment(CommentRequestDto requestDto, HttpServletRequest request) {
     Member member = validateMember(request);
     if (null == member) {
       return ResponseDto.fail("INVALID_TOKEN", "refresh token is invalid");
     }
 
-    Post post = Post.builder()
-        .title(requestDto.getTitle())
-        .content(requestDto.getContent())
+    Post post = postService.isPresentPost(requestDto.getPostId());
+    if (null == post) {
+      return ResponseDto.fail("NOT_FOUND", "post id is not exist");
+    }
+
+    Comment comment = Comment.builder()
         .member(member)
+        .post(post)
+        .content(requestDto.getContent())
         .build();
-    postRepository.save(post);
+    commentRepository.save(comment);
     return ResponseDto.success(
-        PostResponseDto.builder()
-            .id(post.getId())
-            .title(post.getTitle())
-            .content(post.getContent())
-            .author(post.getMember().getNickname())
-            .createdAt(post.getCreatedAt())
-            .modifiedAt(post.getModifiedAt())
+        CommentResponseDto.builder()
+            .id(comment.getId())
+            .author(comment.getMember().getNickname())
+            .content(comment.getContent())
+            .createdAt(comment.getCreatedAt())
+            .modifiedAt(comment.getModifiedAt())
             .build()
     );
   }
 
   @Transactional(readOnly = true)
-  public ResponseDto<?> getPost(Long id) {
-    Post post = isPresentPost(id);
+  public ResponseDto<?> getAllCommentsByPost(Long postId) {
+    Post post = postService.isPresentPost(postId);
     if (null == post) {
       return ResponseDto.fail("NOT_FOUND", "post id is not exist");
     }
@@ -73,69 +75,66 @@ public class PostService {
               .build()
       );
     }
+    return ResponseDto.success(commentResponseDtoList);
+  }
 
+  @Transactional
+  public ResponseDto<?> updateComment(Long id, CommentRequestDto requestDto, HttpServletRequest request) {
+    Member member = validateMember(request);
+    if (null == member) {
+      return ResponseDto.fail("INVALID_TOKEN", "refresh token is invalid");
+    }
+
+    Post post = postService.isPresentPost(requestDto.getPostId());
+    if (null == post) {
+      return ResponseDto.fail("NOT_FOUND", "post id is not exist");
+    }
+
+    Comment comment = isPresentComment(id);
+    if (null == comment) {
+      return ResponseDto.fail("NOT_FOUND", "comment id is not exist");
+    }
+
+    if (comment.validateMember(member)) {
+      return ResponseDto.fail("BAD_REQUEST", "only author can update");
+    }
+
+    comment.update(requestDto);
     return ResponseDto.success(
-        PostResponseDto.builder()
-            .id(post.getId())
-            .title(post.getTitle())
-            .content(post.getContent())
-            .commentResponseDtoList(commentResponseDtoList)
-            .author(post.getMember().getNickname())
-            .createdAt(post.getCreatedAt())
-            .modifiedAt(post.getModifiedAt())
+        CommentResponseDto.builder()
+            .id(comment.getId())
+            .author(comment.getMember().getNickname())
+            .content(comment.getContent())
+            .createdAt(comment.getCreatedAt())
+            .modifiedAt(comment.getModifiedAt())
             .build()
     );
   }
 
-  @Transactional(readOnly = true)
-  public ResponseDto<?> getAllPost() {
-    return ResponseDto.success(postRepository.findAllByOrderByModifiedAtDesc());
-  }
-
   @Transactional
-  public ResponseDto<Post> updatePost(Long id, PostRequestDto requestDto, HttpServletRequest request) {
+  public ResponseDto<?> deleteComment(Long id, HttpServletRequest request) {
     Member member = validateMember(request);
     if (null == member) {
       return ResponseDto.fail("INVALID_TOKEN", "refresh token is invalid");
     }
 
-    Post post = isPresentPost(id);
-    if (null == post) {
-      return ResponseDto.fail("NOT_FOUND", "post id is not exist");
+    Comment comment = isPresentComment(id);
+    if (null == comment) {
+      return ResponseDto.fail("NOT_FOUND", "comment id is not exist");
     }
 
-    if (post.validateMember(member)) {
+    if (comment.validateMember(member)) {
       return ResponseDto.fail("BAD_REQUEST", "only author can update");
     }
 
-    post.update(requestDto);
-    return ResponseDto.success(post);
-  }
-
-  @Transactional
-  public ResponseDto<?> deletePost(Long id, HttpServletRequest request) {
-    Member member = validateMember(request);
-    if (null == member) {
-      return ResponseDto.fail("INVALID_TOKEN", "refresh token is invalid");
-    }
-
-    Post post = isPresentPost(id);
-    if (null == post) {
-      return ResponseDto.fail("NOT_FOUND", "post id is not exist");
-    }
-
-    if (post.validateMember(member)) {
-      return ResponseDto.fail("BAD_REQUEST", "only author can delete");
-    }
-
-    postRepository.delete(post);
-    return ResponseDto.success("delete success");
+    commentRepository.delete(comment);
+    return ResponseDto.success("success");
   }
 
   @Transactional(readOnly = true)
-  public Post isPresentPost(Long id) {
-    Optional<Post> optionalPost = postRepository.findById(id);
-    return optionalPost.orElse(null);
+  public Comment isPresentComment(Long id) {
+    Optional<Comment> optionalComment = commentRepository.findById(id);
+    return optionalComment.orElse(null);
   }
 
   @Transactional
@@ -145,5 +144,4 @@ public class PostService {
     }
     return tokenProvider.getMemberFromAuthentication();
   }
-
 }

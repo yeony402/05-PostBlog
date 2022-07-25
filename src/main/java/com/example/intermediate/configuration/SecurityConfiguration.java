@@ -40,21 +40,19 @@ public class SecurityConfiguration {
 
     http.csrf().disable()
 
-        // exception handlingd에 직접 만든 401, 403 class 추가
         .exceptionHandling()
         .authenticationEntryPoint(authenticationEntryPointException)
         .accessDeniedHandler(accessDeniedHandlerException)
 
-        // Spring Security는 기본적으로 session 사용
-        // but 본 로직에서는 session을 사용하지 않으므로 STATELESS 처리
         .and()
         .sessionManagement()
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
         .and()
         .authorizeRequests()
-        .antMatchers("/api/member/signup").permitAll()
-        .antMatchers("/api/member/login").permitAll()
+        .antMatchers("/api/member/*").permitAll()
+        .antMatchers("/api/post/*").permitAll()
+        .antMatchers("/api/comment/*").permitAll()
         .anyRequest().authenticated()
 
         .and()
