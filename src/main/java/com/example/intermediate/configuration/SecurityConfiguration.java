@@ -3,7 +3,9 @@ package com.example.intermediate.configuration;
 import com.example.intermediate.jwt.AccessDeniedHandlerException;
 import com.example.intermediate.jwt.AuthenticationEntryPointException;
 import com.example.intermediate.jwt.TokenProvider;
+import com.example.intermediate.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -24,7 +26,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class SecurityConfiguration {
 
+  @Value("${jwt.secret}")
+  String SECRET_KEY;
   private final TokenProvider tokenProvider;
+  private final UserDetailsServiceImpl userDetailsService;
   private final AuthenticationEntryPointException authenticationEntryPointException;
   private final AccessDeniedHandlerException accessDeniedHandlerException;
 
@@ -50,13 +55,13 @@ public class SecurityConfiguration {
 
         .and()
         .authorizeRequests()
-        .antMatchers("/api/member/*").permitAll()
-        .antMatchers("/api/post/*").permitAll()
-        .antMatchers("/api/comment/*").permitAll()
+        .antMatchers("/api/member/**").permitAll()
+        .antMatchers("/api/post/**").permitAll()
+        .antMatchers("/api/comment/**").permitAll()
         .anyRequest().authenticated()
 
         .and()
-        .apply(new JwtSecurityConfiguration(tokenProvider));
+        .apply(new JwtSecurityConfiguration(SECRET_KEY, tokenProvider, userDetailsService));
 
     return http.build();
   }
