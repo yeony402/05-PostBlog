@@ -2,7 +2,6 @@ package com.example.intermediate.controller;
 
 import com.example.intermediate.controller.request.PostRequestDto;
 import com.example.intermediate.controller.response.ResponseDto;
-import com.example.intermediate.domain.S3Uploader;
 import com.example.intermediate.service.PostService;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -11,23 +10,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @RequiredArgsConstructor
 @RestController
 public class PostController {
 
   private final PostService postService;
-  private final S3Uploader s3Uploader;
 
   @RequestMapping(value = "/api/auth/post", method = RequestMethod.POST)
   public ResponseDto<?> createPost(@RequestBody PostRequestDto requestDto,
-                                   HttpServletRequest request, MultipartFile multipartFile) throws IOException {
-
-    String imgUrl = s3Uploader.upload(multipartFile, "static");
-
+      HttpServletRequest request) {
     return postService.createPost(requestDto, request);
   }
 
