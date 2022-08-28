@@ -12,10 +12,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
+import org.springframework.util.StringUtils;
 
 @Builder
 @Getter
@@ -34,6 +33,8 @@ public class Post extends Timestamped {
   @Column(nullable = false)
   private String content;
 
+  private String imgUrl;
+
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Comment> comments;
 
@@ -41,9 +42,16 @@ public class Post extends Timestamped {
   @ManyToOne(fetch = FetchType.LAZY)
   private Member member;
 
+  public Post(PostRequestDto postRequestDto) {
+    this.title = postRequestDto.getTitle();
+    this.content = postRequestDto.getContent();
+    this.imgUrl = StringUtils.hasText(imgUrl) ? imgUrl : this.imgUrl;
+  }
+
   public void update(PostRequestDto postRequestDto) {
     this.title = postRequestDto.getTitle();
     this.content = postRequestDto.getContent();
+    this.imgUrl = StringUtils.hasText(imgUrl) ? imgUrl : this.imgUrl;
   }
 
   public boolean validateMember(Member member) {

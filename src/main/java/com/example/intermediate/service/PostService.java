@@ -7,6 +7,7 @@ import com.example.intermediate.domain.Member;
 import com.example.intermediate.domain.Post;
 import com.example.intermediate.controller.request.PostRequestDto;
 import com.example.intermediate.controller.response.ResponseDto;
+import com.example.intermediate.domain.S3Uploader;
 import com.example.intermediate.jwt.TokenProvider;
 import com.example.intermediate.repository.CommentRepository;
 import com.example.intermediate.repository.PostRepository;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +26,6 @@ public class PostService {
 
   private final PostRepository postRepository;
   private final CommentRepository commentRepository;
-
   private final TokenProvider tokenProvider;
 
   @Transactional
@@ -47,6 +48,7 @@ public class PostService {
     Post post = Post.builder()
         .title(requestDto.getTitle())
         .content(requestDto.getContent())
+        .imgUrl(requestDto.getImgUrl())
         .member(member)
         .build();
     postRepository.save(post);
@@ -56,6 +58,7 @@ public class PostService {
             .title(post.getTitle())
             .content(post.getContent())
             .author(post.getMember().getNickname())
+            .imgUrl(post.getImgUrl())
             .createdAt(post.getCreatedAt())
             .modifiedAt(post.getModifiedAt())
             .build()
@@ -91,6 +94,7 @@ public class PostService {
             .content(post.getContent())
             .commentResponseDtoList(commentResponseDtoList)
             .author(post.getMember().getNickname())
+            .imgUrl(post.getImgUrl())
             .createdAt(post.getCreatedAt())
             .modifiedAt(post.getModifiedAt())
             .build()
