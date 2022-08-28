@@ -7,13 +7,7 @@ import com.example.intermediate.controller.response.ResponseDto;
 import com.example.intermediate.controller.request.TokenDto;
 import com.example.intermediate.repository.RefreshTokenRepository;
 import com.example.intermediate.service.UserDetailsServiceImpl;
-import com.example.intermediate.shared.Authority;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
@@ -40,29 +34,34 @@ import org.springframework.transaction.annotation.Transactional;
 public class TokenProvider {
 
   private static final String AUTHORITIES_KEY = "auth";
-  private static final String BEARER_PREFIX = "Bearer ";
+  private static final String BEARER_TYPE = "bearer";
   private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;            //30분
   private static final long REFRESH_TOKEN_EXPRIRE_TIME = 1000 * 60 * 60 * 24 * 7;     //7일
 
   private final Key key;
 
   private final RefreshTokenRepository refreshTokenRepository;
-//  private final UserDetailsServiceImpl userDetailsService;
+  private final UserDetailsServiceImpl userDetailsService;
 
   public TokenProvider(@Value("${jwt.secret}") String secretKey,
-      RefreshTokenRepository refreshTokenRepository) {
+      RefreshTokenRepository refreshTokenRepository, UserDetailsServiceImpl userDetailsService) {
     this.refreshTokenRepository = refreshTokenRepository;
+    this.userDetailsService = userDetailsService;
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
     this.key = Keys.hmacShaKeyFor(keyBytes);
   }
 
-  public TokenDto generateTokenDto(Member member) {
+  public TokenDto generateTokenDto(Authentication authentication) {
+    String authorities = authentication.getAuthorities().stream()
+        .map(GrantedAuthority::getAuthority)
+        .collect(Collectors.joining(","));
+
     long now = (new Date().getTime());
 
     Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
     String accessToken = Jwts.builder()
-        .setSubject(member.getNickname())
-        .claim(AUTHORITIES_KEY, Authority.ROLE_MEMBER.toString())
+        .setSubject(authentication.getName())
+        .claim(AUTHORITIES_KEY, authorities)
         .setExpiration(accessTokenExpiresIn)
         .signWith(key, SignatureAlgorithm.HS256)
         .compact();
@@ -71,6 +70,8 @@ public class TokenProvider {
         .setExpiration(new Date(now + REFRESH_TOKEN_EXPRIRE_TIME))
         .signWith(key, SignatureAlgorithm.HS256)
         .compact();
+
+    Member member = ((UserDetailsImpl) authentication.getPrincipal()).getMember();
 
     RefreshToken refreshTokenObject = RefreshToken.builder()
         .id(member.getId())
@@ -81,7 +82,7 @@ public class TokenProvider {
     refreshTokenRepository.save(refreshTokenObject);
 
     return TokenDto.builder()
-        .grantType(BEARER_PREFIX)
+        .grantType(BEARER_TYPE)
         .accessToken(accessToken)
         .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
         .refreshToken(refreshToken)
@@ -89,22 +90,22 @@ public class TokenProvider {
 
   }
 
-//  public Authentication getAuthentication(String accessToken) {
-//    Claims claims = parseClaims(accessToken);
-//
-//    if (claims.get(AUTHORITIES_KEY) == null) {
-//      throw new RuntimeException("권한 정보가 없는 토큰 입니다.");
-//    }
-//
-//    Collection<? extends GrantedAuthority> authorities =
-//        Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-//            .map(SimpleGrantedAuthority::new)
-//            .collect(Collectors.toList());
-//
-//    UserDetails principal = userDetailsService.loadUserByUsername(claims.getSubject());
-//
-//    return new UsernamePasswordAuthenticationToken(principal, "", authorities);
-//  }
+  public Authentication getAuthentication(String accessToken) {
+    Claims claims = parseClaims(accessToken);
+
+    if (claims.get(AUTHORITIES_KEY) == null) {
+      throw new RuntimeException("권한 정보가 없는 토큰 입니다.");
+    }
+
+    Collection<? extends GrantedAuthority> authorities =
+        Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toList());
+
+    UserDetails principal = userDetailsService.loadUserByUsername(claims.getSubject());
+
+    return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+  }
 
   public Member getMemberFromAuthentication() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -131,13 +132,13 @@ public class TokenProvider {
     return false;
   }
 
-//  private Claims parseClaims(String accessToken) {
-//    try {
-//      return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
-//    } catch (ExpiredJwtException e) {
-//      return e.getClaims();
-//    }
-//  }
+  private Claims parseClaims(String accessToken) {
+    try {
+      return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
+    } catch (ExpiredJwtException e) {
+      return e.getClaims();
+    }
+  }
 
   @Transactional(readOnly = true)
   public RefreshToken isPresentRefreshToken(Member member) {
@@ -149,7 +150,7 @@ public class TokenProvider {
   public ResponseDto<?> deleteRefreshToken(Member member) {
     RefreshToken refreshToken = isPresentRefreshToken(member);
     if (null == refreshToken) {
-      return ResponseDto.fail("TOKEN_NOT_FOUND", "존재하지 않는 Token 입니다.");
+      return ResponseDto.fail("TOKEN_NOT_FOUND", "refresh token not found");
     }
 
     refreshTokenRepository.delete(refreshToken);

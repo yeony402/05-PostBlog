@@ -29,19 +29,9 @@ public class PostService {
 
   @Transactional
   public ResponseDto<?> createPost(PostRequestDto requestDto, HttpServletRequest request) {
-    if (null == request.getHeader("Refresh-Token")) {
-      return ResponseDto.fail("MEMBER_NOT_FOUND",
-          "로그인이 필요합니다.");
-    }
-
-    if (null == request.getHeader("Authorization")) {
-      return ResponseDto.fail("MEMBER_NOT_FOUND",
-          "로그인이 필요합니다.");
-    }
-
     Member member = validateMember(request);
     if (null == member) {
-      return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+      return ResponseDto.fail("INVALID_TOKEN", "refresh token is invalid");
     }
 
     Post post = Post.builder()
@@ -66,7 +56,7 @@ public class PostService {
   public ResponseDto<?> getPost(Long id) {
     Post post = isPresentPost(id);
     if (null == post) {
-      return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
+      return ResponseDto.fail("NOT_FOUND", "post id is not exist");
     }
 
     List<Comment> commentList = commentRepository.findAllByPost(post);
@@ -104,28 +94,18 @@ public class PostService {
 
   @Transactional
   public ResponseDto<Post> updatePost(Long id, PostRequestDto requestDto, HttpServletRequest request) {
-    if (null == request.getHeader("Refresh-Token")) {
-      return ResponseDto.fail("MEMBER_NOT_FOUND",
-          "로그인이 필요합니다.");
-    }
-
-    if (null == request.getHeader("Authorization")) {
-      return ResponseDto.fail("MEMBER_NOT_FOUND",
-          "로그인이 필요합니다.");
-    }
-
     Member member = validateMember(request);
     if (null == member) {
-      return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+      return ResponseDto.fail("INVALID_TOKEN", "refresh token is invalid");
     }
 
     Post post = isPresentPost(id);
     if (null == post) {
-      return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
+      return ResponseDto.fail("NOT_FOUND", "post id is not exist");
     }
 
     if (post.validateMember(member)) {
-      return ResponseDto.fail("BAD_REQUEST", "작성자만 수정할 수 있습니다.");
+      return ResponseDto.fail("BAD_REQUEST", "only author can update");
     }
 
     post.update(requestDto);
@@ -134,28 +114,18 @@ public class PostService {
 
   @Transactional
   public ResponseDto<?> deletePost(Long id, HttpServletRequest request) {
-    if (null == request.getHeader("Refresh-Token")) {
-      return ResponseDto.fail("MEMBER_NOT_FOUND",
-          "로그인이 필요합니다.");
-    }
-
-    if (null == request.getHeader("Authorization")) {
-      return ResponseDto.fail("MEMBER_NOT_FOUND",
-          "로그인이 필요합니다.");
-    }
-
     Member member = validateMember(request);
     if (null == member) {
-      return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+      return ResponseDto.fail("INVALID_TOKEN", "refresh token is invalid");
     }
 
     Post post = isPresentPost(id);
     if (null == post) {
-      return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
+      return ResponseDto.fail("NOT_FOUND", "post id is not exist");
     }
 
     if (post.validateMember(member)) {
-      return ResponseDto.fail("BAD_REQUEST", "작성자만 삭제할 수 있습니다.");
+      return ResponseDto.fail("BAD_REQUEST", "only author can delete");
     }
 
     postRepository.delete(post);
