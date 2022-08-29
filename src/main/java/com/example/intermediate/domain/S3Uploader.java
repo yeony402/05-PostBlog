@@ -1,5 +1,6 @@
 package com.example.intermediate.domain;
 
+
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
@@ -7,6 +8,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
@@ -23,8 +25,10 @@ public class S3Uploader {
 
     private final AmazonS3Client amazonS3Client;
 
-//    @Value("${aws.s3.bucket}")
+//    @Value("${cloud.aws.s3.bucket}") // 이거 쓰면 에러나는데 이유를 모름
     private final String bucket = "postblog-bucket";
+
+
 
     // MultipartFile을 전달받아 File로 전환한 후 S3에 업로드
     public String upload(MultipartFile multipartFile, String dirName) throws IOException {
