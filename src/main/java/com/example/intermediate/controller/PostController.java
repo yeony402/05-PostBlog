@@ -2,6 +2,7 @@ package com.example.intermediate.controller;
 
 import com.example.intermediate.controller.request.PostRequestDto;
 import com.example.intermediate.controller.response.ResponseDto;
+import com.example.intermediate.domain.S3Uploader;
 import com.example.intermediate.service.PostService;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,8 @@ public class PostController {
   @RequestMapping(value = "/api/auth/post", method = RequestMethod.POST)
   public ResponseDto<?> createPost(@RequestBody PostRequestDto requestDto,
       HttpServletRequest request) {
-    return postService.createPost(requestDto, request);
+
+      return postService.createPost(requestDto, request);
   }
 
   @RequestMapping(value = "/api/post/{id}", method = RequestMethod.GET)

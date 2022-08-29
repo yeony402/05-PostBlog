@@ -24,7 +24,6 @@ public class PostService {
 
   private final PostRepository postRepository;
   private final CommentRepository commentRepository;
-
   private final TokenProvider tokenProvider;
 
   @Transactional
@@ -37,6 +36,7 @@ public class PostService {
     Post post = Post.builder()
         .title(requestDto.getTitle())
         .content(requestDto.getContent())
+        .imgUrl(requestDto.getImgUrl())
         .member(member)
         .build();
     postRepository.save(post);
@@ -46,6 +46,7 @@ public class PostService {
             .title(post.getTitle())
             .content(post.getContent())
             .author(post.getMember().getNickname())
+            .imgUrl(post.getImgUrl())
             .createdAt(post.getCreatedAt())
             .modifiedAt(post.getModifiedAt())
             .build()
@@ -81,6 +82,7 @@ public class PostService {
             .content(post.getContent())
             .commentResponseDtoList(commentResponseDtoList)
             .author(post.getMember().getNickname())
+            .imgUrl(post.getImgUrl())
             .createdAt(post.getCreatedAt())
             .modifiedAt(post.getModifiedAt())
             .build()
