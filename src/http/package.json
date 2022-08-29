@@ -1,0 +1,8 @@
+{
+  "local": {
+    "nickname": "test",
+    "password": "test1234",
+    "auth_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiYXV0aCI6IlJPTEVfTUVNQkVSIiwiZXhwIjoxNjYxNzQyNzcwfQ.-sG_RdV6ibCi3Z8HAhfgZzBWZLwB5-7TcbHR-RSViDU",
+    "refresh_token": "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjIzNDU3NzB9.38PtqhuH2aylScce_peUHVYrJuVpnwUsvCKdmci2Y9Y"
+  }
+}

@@ -1,0 +1,8 @@
+
+
+###
+  local: {
+    "apiAddress" : "http://localhost",
+    "username" : "localUser01",
+    "password" : "password01"
+  }

@@ -1,0 +1,45 @@
+// 회원가입
+###
+POST http://localhost:8080/api/member/signup
+Content-Type: application/json
+
+{
+  "nickname":"test",
+  "password":"test1234",
+  "passwordConfirm":"test1234"
+}
+
+<> 2022-08-27T123645.200.json
+<> 2022-08-27T123618.200.json
+<> 2022-08-27T103809.200.json
+<> 2022-08-27T103712.500.json
+<> 2022-08-27T103615.500.json
+<> 2022-08-27T103611.500.json
+
+
+// 로그인
+###
+POST http://localhost:8080/api/member/login
+Content-Type: application/json
+
+{
+  "nickname":"test",
+  "password": "test1234"
+}
+
+
+<> 2022-08-27T133057.200.json
+<> 2022-08-27T130052.200.json
+<> 2022-08-27T123712.200.json
+<> 2022-08-27T123701.200.json
+<> 2022-08-27T123039.200.json
+<> 2022-08-27T103846.200.json
+<> 2022-08-27T103722.500.json
+<> 2022-08-27T094401.200.json
+<> 2022-08-26T225559.200.json
+
+<> 2022-08-27T132610.200.json
+
+
+
+<> 2022-08-27T132708.200.json

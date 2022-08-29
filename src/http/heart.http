@@ -1,0 +1,11 @@
+
+###
+POST http://localhost:8080/api/auth/heart
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+Refresh-Token: {{refresh_token}}
+
+{
+  "postId": 1,
+  "memberId": 1
+}

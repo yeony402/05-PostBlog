@@ -1,0 +1,57 @@
+
+// 게시글 작성
+###
+POST http://localhost:8080/api/auth/post
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiYXV0aCI6IlJPTEVfTUVNQkVSIiwiZXhwIjoxNjYxNTczMjMxfQ.x4Qs95xk32C5YZ7xdf00o_eeHNLYBwJSPL8mX9eg7F4
+Refresh-Token: eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjIxNzYyMzF9.jRxbAm-vj0Olw0IAqTNZqZwkK2WaSVWlFQvEbpeQsgY
+
+{
+  "title": "테스트1",
+  "content": "안녕하세요"
+}
+
+
+<> 2022-08-27T125001.401.json
+<> 2022-08-27T124517.200.json
+<> 2022-08-27T124442.200.json
+<> 2022-08-27T124421.401.json
+<> 2022-08-27T124419.401.json
+<> 2022-08-27T124201.401.json
+<> 2022-08-27T124158.401.json
+<> 2022-08-27T123526.401.json
+<> 2022-08-27T123518.401.json
+<> 2022-08-27T123053.401.json
+<> 2022-08-27T123051.401.json
+<> 2022-08-27T103904.401.json
+<> 2022-08-27T103852.401.json
+<> 2022-08-27T094417.500.json
+<> 2022-08-27T093152.500.json
+
+// 게시글 전체 조회
+###
+GET http://localhost:8080/api/post
+Content-Type: application/json
+
+<> 2022-08-27T124717.200.json
+
+// id의 게시글 조회
+###
+GET http://localhost:8080/api/post/1
+Content-Type: application/json
+
+<> 2022-08-27T124751.200.json
+
+// id의 게시글 수정
+###
+PUT http://localhost:8080/api/auth/post/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiYXV0aCI6IlJPTEVfTUVNQkVSIiwiZXhwIjoxNjYxNTczMjMxfQ.x4Qs95xk32C5YZ7xdf00o_eeHNLYBwJSPL8mX9eg7F4
+Refresh-Token: eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjIxNzYyMzF9.jRxbAm-vj0Olw0IAqTNZqZwkK2WaSVWlFQvEbpeQsgY
+
+{
+  "title": "업데이트 성공",
+  "content": "안녕하세요"
+}
+
+<> 2022-08-27T125116.200.json

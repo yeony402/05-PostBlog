@@ -1,0 +1,56 @@
+
+// 댓글 작성
+###
+POST http://localhost:8080/api/auth/comment
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiYXV0aCI6IlJPTEVfTUVNQkVSIiwiZXhwIjoxNjYxNTc2NDU2fQ.lNC36GUqpKXBhug7mffyDDP31GJ1W9Zg_YCAh3FRRgg
+Refresh-Token: eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjIxNzk0NTZ9.nCLSXQbY4P9uVNESLZ5yD60wtTvhFO6xA-9CMGH2XDk
+
+{
+  "postId": 1,
+  "content": "성공하셔서 좋겠어요22"
+}
+
+
+<> 2022-08-27T133114.200.json
+<> 2022-08-27T133047.401.json
+<> 2022-08-27T133045.401.json
+<> 2022-08-27T133012.401.json
+<> 2022-08-27T131519.401.json
+<> 2022-08-27T125403.200.json
+<> 2022-08-27T125314.200.json
+
+// id인 댓글 가져오기
+###
+GET http://localhost:8080/api/comment/1
+
+<> 2022-08-27T125426.200.json
+
+// id인 댓글 삭제하기
+###
+DELETE http://localhost:8080/api/auth/comment/2
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiYXV0aCI6IlJPTEVfTUVNQkVSIiwiZXhwIjoxNjYxNTc0NjUyfQ.D0AZxZdYAsmORw_sxiPRGD7fdWcRw5lJcum9mQUx_U4
+Refresh-Token: eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjIxNzc2NTJ9.FppTSMBB-dc-YS-05NeiDHeCBup9Dnq1UR2jnGSpDGI
+
+
+<> 2022-08-27T131440.200.json
+<> 2022-08-27T131015.400.json
+<> 2022-08-27T130206.500.json
+<> 2022-08-27T130019.500.json
+<> 2022-08-27T125748.500.json
+<> 2022-08-27T125706.500.json
+
+// id인 댓글 수정하기
+###
+PUT http://localhost:8080/api/auth/comment/3
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiYXV0aCI6IlJPTEVfTUVNQkVSIiwiZXhwIjoxNjYxNTc2NDU2fQ.lNC36GUqpKXBhug7mffyDDP31GJ1W9Zg_YCAh3FRRgg
+Refresh-Token: eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjIxNzk0NTZ9.nCLSXQbY4P9uVNESLZ5yD60wtTvhFO6xA-9CMGH2XDk
+
+{
+  "postId": "1",
+  "content": "댓글 업데이트 성공"
+}
+
+<> 2022-08-27T133342.200.json
