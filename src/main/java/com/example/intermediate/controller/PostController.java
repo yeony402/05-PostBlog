@@ -2,10 +2,14 @@ package com.example.intermediate.controller;
 
 import com.example.intermediate.controller.request.PostRequestDto;
 import com.example.intermediate.controller.response.ResponseDto;
+import com.example.intermediate.domain.S3Uploader;
 import com.example.intermediate.service.PostService;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 
 @RequiredArgsConstructor
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
   private final PostService postService;
+  private final S3Uploader s3Uploader;
 
 
   @RequestMapping(value = "/api/auth/post", method = RequestMethod.POST)
@@ -21,6 +26,15 @@ public class PostController {
 
       return postService.createPost(requestDto, request);
   }
+
+
+  @PostMapping("/api/upload/image")
+  @ResponseBody
+  public String upload(@RequestParam("data") MultipartFile multipartFile) throws IOException {
+    return s3Uploader.upload(multipartFile, "static");
+    
+  }
+
 
 
   @RequestMapping(value = "/api/post/{id}", method = RequestMethod.GET)
