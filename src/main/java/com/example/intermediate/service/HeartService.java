@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,14 +28,16 @@ public class HeartService {
 
     @Transactional
     public ResponseDto<?> heart(HeartRequestDto heartDto, HttpServletRequest request) {
+        // response 200 응답
+        // 실행안됨
         validate(request);
 
         Post post = postRepository.findById(heartDto.getPostId()).get();
         Member member = memberRepository.findById(heartDto.getMemberId()).get();
-        List<Heart> heartobj = heartRepository.findHeartByMemberAndPost(member, post);
+        Optional<Heart> heartobj = heartRepository.findHeartByMemberAndPost(member, post);
 
-        if (null == heartobj) {
-            throw new RuntimeException("좋아요가 없습니다.");
+        if (heartobj.isPresent()) {
+            throw new RuntimeException("이미 좋아요를 눌렀습니다.");
         }
 
         Heart heart = Heart.builder()
@@ -42,6 +45,8 @@ public class HeartService {
                 .member(member)
                 .build();
 
+        // 좋아요 정보 저장
+        // 1 리턴
         heartRepository.save(heart);
         return ResponseDto.success(
                 HeartResponseDto.builder()
@@ -57,20 +62,15 @@ public class HeartService {
 
         Post post = postRepository.findById(heartDto.getPostId()).get();
         Member member = memberRepository.findById(heartDto.getMemberId()).get();
-        List<Heart> heartobj = heartRepository.findHeartByMemberAndPost(member, post);
+        Optional<Heart> heartobj = heartRepository.findHeartByMemberAndPost(member, post);
 
         if (heartobj.isEmpty()) {
             throw new RuntimeException("좋아요가 없습니다.");
         }
 
-        Heart heart = Heart.builder()
-                .post(post)
-                .member(member)
-                .build();
-
         // 좋아요 삭제
         // 0 리턴
-        heartRepository.delete(heart);
+        heartRepository.delete(heartobj.get());
         return ResponseDto.success(
                 HeartResponseDto.builder()
                         .heart(0)
