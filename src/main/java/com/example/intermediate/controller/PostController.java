@@ -2,10 +2,10 @@ package com.example.intermediate.controller;
 
 import com.example.intermediate.controller.request.PostRequestDto;
 import com.example.intermediate.controller.response.ResponseDto;
-import com.example.intermediate.domain.S3Uploader;
 import com.example.intermediate.service.PostService;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,24 +17,22 @@ import java.io.IOException;
 public class PostController {
 
   private final PostService postService;
-  private final S3Uploader s3Uploader;
 
 
-  @RequestMapping(value = "/api/auth/post", method = RequestMethod.POST)
-  public ResponseDto<?> createPost(@RequestBody PostRequestDto requestDto,
-                                   HttpServletRequest request) {
+  @RequestMapping(value = "/api/auth/post", method = RequestMethod.POST, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseDto<?> createPost(@RequestPart PostRequestDto requestDto, @RequestPart(required = false) MultipartFile multipartFile,
+                                   HttpServletRequest request) throws IOException {
 
-      return postService.createPost(requestDto, request);
+    return postService.createPost(requestDto, request, multipartFile);
   }
 
 
-  @PostMapping("/api/upload/image")
-  @ResponseBody
-  public String upload(@RequestParam("data") MultipartFile multipartFile) throws IOException {
-    return s3Uploader.upload(multipartFile, "static");
-    
-  }
-
+//  @RequestMapping(value = "/api/upload/image", method = RequestMethod.POST)
+//  @ResponseBody
+//  public String upload(@RequestParam("data") MultipartFile multipartFile) throws IOException {
+//
+//    return s3Uploader.upload(multipartFile, "static");
+//  }
 
 
   @RequestMapping(value = "/api/post/{id}", method = RequestMethod.GET)

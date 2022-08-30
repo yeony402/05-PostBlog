@@ -1,0 +1,48 @@
+### 회원가입
+POST http://localhost:8080/api/member/signup
+Content-type: application/json
+
+{
+  "nickname": "user1",
+  "password": "1111",
+  "passwordConfirm": "1111"
+}
+
+### 로그인
+POST http://localhost:8080/api/member/login
+Content-type: application/json
+
+{
+  "nickname": "user1",
+  "password": "1111"
+}
+
+
+### 글작성
+POST http://localhost:8080/api/auth/post
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMSIsImF1dGgiOiJST0xFX01FTUJFUiIsImV4cCI6MTY2MTgzMDg5Mn0.W4-Q5xc6gaDNLJhGrKBpQzaJgZG33vulYpotLjt-Mj0
+Refresh-Token: Bearer eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjI0MzM4OTJ9.F9xUVNJEROJcwsBtRMke1At66y6WRbzOOyOrbQmieok
+
+{
+  "title": "유저1의 제목잼잼",
+  "content": "유저1의 내용잼잼",
+  "imgUrl": "https://img.danawa.com/prod_img/500000/279/192/img/14192279_1.jpg?shrink=330:330&_v=20210518140020"
+}
+
+### 이미지 업로드
+POST http://localhost:8080/api/upload/image
+#Content-Transfer-Encoding: multipart/form-data
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="data"; filename="3.JPG"
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMSIsImF1dGgiOiJST0xFX01FTUJFUiIsImV4cCI6MTY2MTc5MzQ4M30.bu3e1wFPTI6D9q3VExtJogKK0O4wms-3AI3tVCitUT0
+Refresh-Token: Bearer eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjIzOTY0ODN9.cf2XtU7ZO_xAXGCrgxZ2Ucnej7ofr00rgA8faKNBqFk
+
+< /g4dalcom/momentum/img/3.JPG
+
+
+### 게시글 전체 목록
+GET http://localhost:8080/api/post
+content-type: application/json

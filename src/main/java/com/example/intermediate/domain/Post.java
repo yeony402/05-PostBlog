@@ -16,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.util.StringUtils;
 
 @Builder
 @Getter
@@ -45,16 +44,18 @@ public class Post extends Timestamped {
   @ManyToOne(fetch = FetchType.LAZY)
   private Member member;
 
+
   public Post(PostRequestDto postRequestDto) {
     this.title = postRequestDto.getTitle();
     this.content = postRequestDto.getContent();
-    this.imgUrl = StringUtils.hasText(imgUrl) ? imgUrl : this.imgUrl;
+    this.imgUrl = postRequestDto.getImgUrl();
   }
+
 
   public void update(PostRequestDto postRequestDto) {
     this.title = postRequestDto.getTitle();
     this.content = postRequestDto.getContent();
-    this.imgUrl = StringUtils.hasText(imgUrl) ? imgUrl : this.imgUrl;
+    this.imgUrl = postRequestDto.getImgUrl();
   }
 
   public boolean validateMember(Member member) {
