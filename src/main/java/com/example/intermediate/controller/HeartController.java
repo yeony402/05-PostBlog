@@ -13,7 +13,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor //final이 붙거나 @NotNull 이 붙은 필드의 생성자를 자동 생성
 @RestController
 public class HeartController {
-    HeartService heartService;
+    private final HeartService heartService;
 
     @RequestMapping(value = "/api/auth/heart", method = RequestMethod.POST)
     public ResponseDto<?> heart(@RequestBody @Valid HeartRequestDto heartDto, HttpServletRequest request) {

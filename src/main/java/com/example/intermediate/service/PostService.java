@@ -172,12 +172,6 @@ public class PostService {
     return optionalPost.orElse(null);
   }
 
-  // 좋아요 상태 리턴
-//  @Transactional(readOnly = true)
-//  public Heart isPresentHeart(Long id, Long member_id) {
-//    Optional<Heart> optionalheart = heartRepository.findHeartByMemberAndPostId(member_id, id);
-//    return optionalheart.orElse(null);
-//  }
 
   @Transactional
   public Member validateMember(HttpServletRequest request) {
