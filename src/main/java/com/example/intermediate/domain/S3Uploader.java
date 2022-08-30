@@ -5,8 +5,10 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.example.intermediate.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +18,8 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 import java.lang.String;
+import static com.example.intermediate.exception.ErrorCode.FAILURE_CONVERSION_FILE;
+import static com.example.intermediate.exception.ErrorCode.NOT_IMAGE_FILE;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,17 +28,18 @@ public class S3Uploader {
 
     private final AmazonS3Client amazonS3Client;
 
-//    @Value("${cloud.aws.s3.bucket}") // 이거 쓰면 에러나는데 이유를 모름
-//    private final String bucket = "postblog-bucket";
-
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
 
     // MultipartFile을 전달받아 File로 전환한 후 S3에 업로드
     public String upload(MultipartFile multipartFile, String dirName) throws IOException {
+        if (!multipartFile.isEmpty()) {
+            isImage(multipartFile);
+        }
+
         File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러
-                .orElseThrow(() -> new IllegalArgumentException("error: 파일 변환에 실패하였습니다."));
+                .orElseThrow(() -> new CustomException(FAILURE_CONVERSION_FILE));
 
         return upload(uploadFile, dirName);
     }
@@ -81,6 +86,21 @@ public class S3Uploader {
 
     public void deleteImage(String fileName) {
         amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
+    }
+
+
+    // 이미지 파일인지 확인하는 메소드
+    private void isImage(MultipartFile multipartFile) throws IOException {
+
+        // tika를 이용해 파일 MIME 타입 체크
+        // 파일명에 .jpg 식으로 붙는 확장자는 없앨 수도 있고 조작도 가능하므로 MIME 타입을 체크하는 것이 좋다.
+        Tika tika = new Tika();
+        String mimeType = tika.detect(multipartFile.getInputStream());
+
+        // MIME타입이 이미지가 아니면 exception 발생
+        if (!mimeType.startsWith("image/")) {
+            throw new CustomException(NOT_IMAGE_FILE);
+        }
     }
 
 }
