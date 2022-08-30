@@ -27,14 +27,6 @@ public class PostController {
   }
 
 
-//  @RequestMapping(value = "/api/upload/image", method = RequestMethod.POST)
-//  @ResponseBody
-//  public String upload(@RequestParam("data") MultipartFile multipartFile) throws IOException {
-//
-//    return s3Uploader.upload(multipartFile, "static");
-//  }
-
-
   @RequestMapping(value = "/api/post/{id}", method = RequestMethod.GET)
   public ResponseDto<?> getPost(@PathVariable Long id) {
     return postService.getPost(id);
