@@ -1,18 +1,16 @@
 package com.example.intermediate.domain;
 
 import com.example.intermediate.controller.request.CommentRequestDto;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
+
+import java.util.List;
 
 @Builder
 @Getter
@@ -32,6 +30,13 @@ public class Comment extends Timestamped {
   @JoinColumn(name = "post_id", nullable = false)
   @ManyToOne(fetch = FetchType.LAZY)
   private Post post;
+
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  private List<Heart> hearts;
+
+  // 댓글 좋아요 수 집계 안됨
+  @Formula("(select count(1) from heart_comment he where he.comment_id = id)")
+  private int totalHeartCount;
 
   @Column(nullable = false)
   private String content;

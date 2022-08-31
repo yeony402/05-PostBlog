@@ -76,13 +76,14 @@ public class CommentService {
 
     for (Comment comment : commentList) {
       commentResponseDtoList.add(
-          CommentResponseDto.builder()
-              .id(comment.getId())
-              .author(comment.getMember().getNickname())
-              .content(comment.getContent())
-              .createdAt(comment.getCreatedAt())
-              .modifiedAt(comment.getModifiedAt())
-              .build()
+              CommentResponseDto.builder()
+                      .id(comment.getId())
+                      .author(comment.getMember().getNickname())
+                      .content(comment.getContent())
+                      .totalHeartCount(comment.getTotalHeartCount())
+                      .createdAt(comment.getCreatedAt())
+                      .modifiedAt(comment.getModifiedAt())
+                      .build()
       );
     }
     return ResponseDto.success(commentResponseDtoList);

@@ -6,9 +6,10 @@ import com.example.intermediate.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface HeartRepository extends JpaRepository<Heart, Long> {
 
-    List<Heart> findHeartByMemberAndPost(Member member, Post post);
+    Optional<Heart> findHeartByMemberAndPost(Member member, Post post);
 
 }
