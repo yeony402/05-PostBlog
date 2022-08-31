@@ -1,7 +1,8 @@
 package com.example.intermediate.controller;
 
 
-import com.example.intermediate.controller.request.HeartRequestDto;
+import com.example.intermediate.controller.request.HeartCommentDto;
+import com.example.intermediate.controller.request.HeartDto;
 import com.example.intermediate.controller.response.ResponseDto;
 import com.example.intermediate.service.HeartService;
 import lombok.RequiredArgsConstructor;
@@ -15,15 +16,27 @@ import javax.validation.Valid;
 public class HeartController {
     private final HeartService heartService;
 
-    // 좋아요 0일때 (안 눌렀을 때) 실행
-    @RequestMapping(value = "/api/auth/heart", method = RequestMethod.POST)
-    public ResponseDto<?> heart(@RequestBody @Valid HeartRequestDto heartDto, HttpServletRequest request) {
-        return heartService.heart(heartDto, request);
+    // 게시글 좋아요 0일때 (안 눌렀을 때) 실행
+    @RequestMapping(value = "/api/heart", method = RequestMethod.POST)
+    public ResponseDto<?> heart(@RequestBody @Valid HeartDto heartDto, HttpServletRequest request) {
+        return heartService.postheart(heartDto, request);
     }
 
-    // 좋아요가 1일때 (이미 눌렀을 때) 실행
-    @RequestMapping(value = "/api/auth/heart", method = RequestMethod.DELETE)
-    public ResponseDto<?> unHeart(@RequestBody @Valid HeartRequestDto heartDto, HttpServletRequest request) {
-        return heartService.unHeart(heartDto, request);
+    // 댓글 좋아요 0일때 (안 눌렀을 때) 실행
+    @RequestMapping(value = "/api/heart/comment", method = RequestMethod.POST)
+    public ResponseDto<?> heart(@RequestBody @Valid HeartCommentDto heartDto, HttpServletRequest request) {
+        return heartService.commentheart(heartDto, request);
+    }
+
+    // 게시글 좋아요가 1일때 (이미 눌렀을 때) 실행
+    @RequestMapping(value = "/api/heart", method = RequestMethod.DELETE)
+    public ResponseDto<?> unHeart(@RequestBody @Valid HeartDto heartDto, HttpServletRequest request) {
+        return heartService.postunHeart(heartDto, request);
+    }
+
+    // 댓글 좋아요가 1일때 (이미 눌렀을 때) 실행
+    @RequestMapping(value = "/api/heart/comment", method = RequestMethod.DELETE)
+    public ResponseDto<?> unheart(@RequestBody @Valid HeartCommentDto heartDto, HttpServletRequest request) {
+        return heartService.commentunHeart(heartDto, request);
     }
 }

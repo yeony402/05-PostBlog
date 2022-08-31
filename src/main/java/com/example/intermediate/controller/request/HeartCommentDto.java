@@ -7,8 +7,8 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class HeartRequestDto {
-    private Long postId;
+public class HeartCommentDto {
     private Long memberId;
-
+    private Long postId;
+    private Long commentId;
 }
