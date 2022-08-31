@@ -27,5 +27,8 @@ public class Heart {
     @ManyToOne(fetch = FetchType.LAZY)
     private Post post;
 
+    @JoinColumn(name = "comment_id", nullable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Comment comment;
 
 }

@@ -11,4 +11,5 @@ import org.springframework.lang.Nullable;
 public class HeartDto {
     private Long memberId;
     private Long postId;
+    @Nullable private Long commentId;
 }
