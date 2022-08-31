@@ -65,6 +65,7 @@ public class PostService {
   public ResponseDto<?> getPost(Long id) {
     Post post = isPresentPost(id);
     if (null == post) {
+
       return ResponseDto.fail("NOT_FOUND", "post id is not exist");
     }
 

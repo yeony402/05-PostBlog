@@ -36,7 +36,7 @@ public class S3Uploader {
     public String upload(MultipartFile multipartFile, String dirName) throws IOException {
         if (!multipartFile.isEmpty()) {
             isImage(multipartFile);
-        }
+        } else return null;
 
         File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러
                 .orElseThrow(() -> new CustomException(FAILURE_CONVERSION_FILE));

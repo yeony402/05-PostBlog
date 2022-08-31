@@ -12,11 +12,11 @@ import static com.example.intermediate.exception.ErrorCode.FAILURE_CONVERSION_FI
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = { IllegalArgumentException.class })
-    protected ResponseEntity<ErrorResponse> handleDataException() {
-        log.error("handleDataException throw Exception : {}", FAILURE_CONVERSION_FILE);
-        return ErrorResponse.toResponseEntity(FAILURE_CONVERSION_FILE);
-    }
+//    @ExceptionHandler(value = { IllegalArgumentException.class })
+//    protected ResponseEntity<ErrorResponse> handleDataException() {
+//        log.error("handleDataException throw Exception : {}", FAILURE_CONVERSION_FILE);
+//        return ErrorResponse.toResponseEntity(FAILURE_CONVERSION_FILE);
+//    }
 
     @ExceptionHandler(value = { CustomException.class })
     protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
