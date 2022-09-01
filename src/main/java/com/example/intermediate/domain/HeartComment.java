@@ -1,11 +1,10 @@
 package com.example.intermediate.domain;
 
-
-import com.sun.istack.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 
@@ -14,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Heart {
+public class HeartComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,5 +26,8 @@ public class Heart {
     @ManyToOne(fetch = FetchType.LAZY)
     private Post post;
 
+    @JoinColumn(name = "comment_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Comment comment;
 
 }
