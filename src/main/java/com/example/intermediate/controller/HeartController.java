@@ -1,7 +1,6 @@
 package com.example.intermediate.controller;
 
 
-import com.example.intermediate.controller.request.HeartCommentDto;
 import com.example.intermediate.controller.request.HeartDto;
 import com.example.intermediate.controller.response.ResponseDto;
 import com.example.intermediate.service.HeartService;
@@ -19,24 +18,14 @@ public class HeartController {
     // 게시글 좋아요 0일때 (안 눌렀을 때) 실행
     @RequestMapping(value = "/api/heart", method = RequestMethod.POST)
     public ResponseDto<?> heart(@RequestBody @Valid HeartDto heartDto, HttpServletRequest request) {
-        return heartService.postheart(heartDto, request);
+        return heartService.heart(heartDto, request);
     }
 
-    // 댓글 좋아요 0일때 (안 눌렀을 때) 실행
-    @RequestMapping(value = "/api/heart/comment", method = RequestMethod.POST)
-    public ResponseDto<?> heart(@RequestBody @Valid HeartCommentDto heartDto, HttpServletRequest request) {
-        return heartService.commentheart(heartDto, request);
-    }
 
     // 게시글 좋아요가 1일때 (이미 눌렀을 때) 실행
     @RequestMapping(value = "/api/heart", method = RequestMethod.DELETE)
     public ResponseDto<?> unHeart(@RequestBody @Valid HeartDto heartDto, HttpServletRequest request) {
-        return heartService.postunHeart(heartDto, request);
+        return heartService.unHeart(heartDto, request);
     }
 
-    // 댓글 좋아요가 1일때 (이미 눌렀을 때) 실행
-    @RequestMapping(value = "/api/heart/comment", method = RequestMethod.DELETE)
-    public ResponseDto<?> unheart(@RequestBody @Valid HeartCommentDto heartDto, HttpServletRequest request) {
-        return heartService.commentunHeart(heartDto, request);
-    }
 }
