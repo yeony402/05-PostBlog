@@ -34,7 +34,8 @@ public class Comment extends Timestamped {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   private List<Heart> hearts;
 
-  @Formula("(select count(1) from heart he where he.comment_id=id and he.post_id=post_id)")
+  // 댓글 좋아요 수 집계 안됨
+  @Formula("(select count(1) from heart he where he.comment_id = id and he.post_id=post_id)")
   private int totalHeartCount;
 
   @Column(nullable = false)

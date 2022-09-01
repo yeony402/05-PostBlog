@@ -21,14 +21,14 @@ public class HeartService {
     private final MemberRepository memberRepository;
     private final CommentRepository commentRepository;
 
-
     @Transactional
     public ResponseDto<?> heart(HeartDto heartDto, HttpServletRequest request) {
+
         Post post = postRepository.findById(heartDto.getPostId()).get();
         Member member = memberRepository.findById(heartDto.getMemberId()).get();
 
-        // 게시글 좋아요 등록
-        if (heartDto.getCommentId() == null) {
+        //게시글 좋아요 등록
+        if(heartDto.getCommentId() == null) {
             Optional<Heart> postheart = heartRepository.findHeartByMemberAndPostAndComment(member, post, null);
 
             if (postheart.isPresent()) {
@@ -43,7 +43,7 @@ public class HeartService {
 
             // 게시글 좋아요 정보 저장
             heartRepository.save(heart);
-            // 좋아요 수 반환
+            // 게시글 전체 좋아요 수 반환
             return ResponseDto.success(
                     HeartResponseDto.builder()
                             .totalHeartcount(post.getTotalHeartCount()+1)
@@ -64,7 +64,7 @@ public class HeartService {
                     .comment(comment)
                     .build();
 
-            // 댓글 좋아요 정보 저장
+            //댓글 좋아요 정보 저장
             heartRepository.save(heart);
             // 댓글 전체 좋아요 수 반환
             return ResponseDto.success(
@@ -74,13 +74,15 @@ public class HeartService {
             );
         }
     }
- 
-    // 게시글 좋아요 삭제
+
     @Transactional
     public ResponseDto<?> unHeart(HeartDto heartDto, HttpServletRequest request) {
+
         Post post = postRepository.findById(heartDto.getPostId()).get();
         Member member = memberRepository.findById(heartDto.getMemberId()).get();
-        if(heartDto.getCommentId() == null){
+
+        // 게시글 좋아요 삭제
+        if (heartDto.getCommentId() == null) {
             Optional<Heart> postheart = heartRepository.findHeartByMemberAndPostAndComment(member, post, null);
 
             if (postheart.isEmpty()) {
@@ -89,9 +91,10 @@ public class HeartService {
 
             heartRepository.delete(postheart.get());
 
+            // 게시글 전체 좋아요 수 반환
             return ResponseDto.success(
                     HeartResponseDto.builder()
-                            .totalHeartcount(post.getTotalHeartCount()-1)
+                            .totalHeartcount(post.getTotalHeartCount() - 1)
                             .build()
             );
         } else {
@@ -108,7 +111,7 @@ public class HeartService {
             // 댓글 전체 좋아요 수 반환
             return ResponseDto.success(
                     HeartResponseDto.builder()
-                            .totalHeartcount(comment.getTotalHeartCount()-1)
+                            .totalHeartcount(comment.getTotalHeartCount() - 1)
                             .build()
             );
         }

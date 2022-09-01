@@ -3,8 +3,6 @@ package com.example.intermediate.controller;
 
 import com.example.intermediate.controller.request.HeartDto;
 import com.example.intermediate.controller.response.ResponseDto;
-import com.example.intermediate.exception.CustomException;
-import com.example.intermediate.exception.ErrorCode;
 import com.example.intermediate.service.HeartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +27,5 @@ public class HeartController {
     public ResponseDto<?> unHeart(@RequestBody @Valid HeartDto heartDto, HttpServletRequest request) {
         return heartService.unHeart(heartDto, request);
     }
-
 
 }

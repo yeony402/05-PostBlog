@@ -43,7 +43,7 @@ public class Post extends Timestamped {
   @Formula("(select count(1) from comment co where co.post_id = id)")
   private int totalCommentCount;
 
-  @Formula("(select count(1) from heart he where he.comment_id IS NULL and he.post_id=id)")
+  @Formula("(select count(1) from heart he where he.comment_id IS NULL and he.post_id = id)")
   private int totalHeartCount;
 
   public void update(PostRequestDto postRequestDto) {

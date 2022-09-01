@@ -31,4 +31,5 @@ public class Heart {
     @ManyToOne(fetch = FetchType.LAZY)
     private Comment comment;
 
+
 }
