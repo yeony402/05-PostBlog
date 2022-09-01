@@ -31,51 +31,63 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-  public static String AUTHORIZATION_HEADER = "Authorization";
-  public static String BEARER_PREFIX = "Bearer ";
-
-  public static String AUTHORITIES_KEY = "auth";
-
-  private final String SECRET_KEY;
+//<<<<<<< HEAD
+//  public static String AUTHORIZATION_HEADER = "Authorization";
+//  public static String BEARER_PREFIX = "Bearer ";
+//
+//  public static String AUTHORITIES_KEY = "auth";
+//
+//  private final String SECRET_KEY;
+//
+//  private final TokenProvider tokenProvider;
+//  private final UserDetailsServiceImpl userDetailsService;
+//=======
+  public static final String AUTHORIZATION_HEADER = "Authorization";
+  public static final String BEARER_PREFIX = "Bearer ";
 
   private final TokenProvider tokenProvider;
-  private final UserDetailsServiceImpl userDetailsService;
 
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws IOException, ServletException {
 
-    byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-    Key key = Keys.hmacShaKeyFor(keyBytes);
-
+//<<<<<<< HEAD
+//    byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+//    Key key = Keys.hmacShaKeyFor(keyBytes);
+//
+//    String jwt = resolveToken(request);
+//
+//    if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+//      Claims claims;
+//      try {
+//        claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
+//      } catch (ExpiredJwtException e) {
+//        claims = e.getClaims();
+//      }
+//
+//      if (claims.getExpiration().toInstant().toEpochMilli() < Instant.now().toEpochMilli()) {
+//        response.setContentType("application/json;charset=UTF-8");
+//        response.getWriter().println(
+//            new ObjectMapper().writeValueAsString(
+//                ResponseDto.fail("BAD_REQUEST", "Token이 유효햐지 않습니다.")
+//            )
+//        );
+//        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//      }
+//
+//      String subject = claims.getSubject();
+//      Collection<? extends GrantedAuthority> authorities =
+//          Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+//              .map(SimpleGrantedAuthority::new)
+//              .collect(Collectors.toList());
+//
+//      UserDetails principal = userDetailsService.loadUserByUsername(subject);
+//
+//      Authentication authentication = new UsernamePasswordAuthenticationToken(principal, jwt, authorities);
+//=======
     String jwt = resolveToken(request);
 
     if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-      Claims claims;
-      try {
-        claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
-      } catch (ExpiredJwtException e) {
-        claims = e.getClaims();
-      }
-
-      if (claims.getExpiration().toInstant().toEpochMilli() < Instant.now().toEpochMilli()) {
-        response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().println(
-            new ObjectMapper().writeValueAsString(
-                ResponseDto.fail("BAD_REQUEST", "Token이 유효햐지 않습니다.")
-            )
-        );
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-      }
-
-      String subject = claims.getSubject();
-      Collection<? extends GrantedAuthority> authorities =
-          Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-              .map(SimpleGrantedAuthority::new)
-              .collect(Collectors.toList());
-
-      UserDetails principal = userDetailsService.loadUserByUsername(subject);
-
-      Authentication authentication = new UsernamePasswordAuthenticationToken(principal, jwt, authorities);
+      Authentication authentication = tokenProvider.getAuthentication(jwt);
       SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 

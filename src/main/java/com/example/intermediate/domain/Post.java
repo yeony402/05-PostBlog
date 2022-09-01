@@ -2,8 +2,16 @@ package com.example.intermediate.domain;
 
 import com.example.intermediate.controller.request.PostRequestDto;
 import java.util.List;
-import javax.persistence.*;
-
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,6 +43,12 @@ public class Post extends Timestamped {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   private List<Heart> hearts;
 
+  @Column
+  private String imgUrl;
+
+//  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//  private List<Comment> comments;
+
   @JoinColumn(name = "member_id", nullable = false)
   @ManyToOne(fetch = FetchType.LAZY)
   private Member member;
@@ -46,9 +60,17 @@ public class Post extends Timestamped {
   @Formula("(select count(1) from heart he where he.comment_id IS NULL and he.post_id = id)")
   private int totalHeartCount;
 
+  public Post(PostRequestDto postRequestDto) {
+    this.title = postRequestDto.getTitle();
+    this.content = postRequestDto.getContent();
+    this.imgUrl = postRequestDto.getImgUrl();
+  }
+
+
   public void update(PostRequestDto postRequestDto) {
     this.title = postRequestDto.getTitle();
     this.content = postRequestDto.getContent();
+    this.imgUrl = postRequestDto.getImgUrl();
   }
 
   public boolean validateMember(Member member) {

@@ -4,6 +4,14 @@ import com.example.intermediate.controller.request.CommentRequestDto;
 
 import javax.persistence.*;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,9 +42,10 @@ public class Comment extends Timestamped {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   private List<Heart> hearts;
 
-  // 댓글 좋아요 수 집계 안됨
+
   @Formula("(select count(1) from heart he where he.comment_id = id and he.post_id=post_id)")
   private int totalHeartCount;
+
 
   @Column(nullable = false)
   private String content;

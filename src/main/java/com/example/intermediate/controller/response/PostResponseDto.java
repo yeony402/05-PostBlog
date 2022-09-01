@@ -19,6 +19,7 @@ public class PostResponseDto {
   private List<CommentResponseDto> commentResponseDtoList;
   private int TotalCommentCount;
   private int TotalHeartCount;
+  private String imgUrl;
   private LocalDateTime createdAt;
   private LocalDateTime modifiedAt;
 }

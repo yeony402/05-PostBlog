@@ -234,4 +234,9 @@ gradle-app.setting
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
+<<<<<<< HEAD
+=======
+src/main/resources/aws-s3.yml
+
+>>>>>>> 93b3553a138c386df57e8418da661997334c5180
 # End of https://www.toptal.com/developers/gitignore/api/macos,intellij,java,gradle
