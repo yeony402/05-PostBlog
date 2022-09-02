@@ -7,7 +7,7 @@
 
 ### 🔎 개발환경
 - Java 11
-- SpringBoot 2.7.2
+- SpringBoot 2.7.2 
 - H2, MySQL
 - AWS S3
 
